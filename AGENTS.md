@@ -6,14 +6,21 @@ things by default: an agent-instruction-file convention, and a detach/relaunch w
 
 ## Agent-instruction-file convention
 
-`CLAUDE.md` and `GEMINI.md` in this repo are symlinks to this file (`AGENTS.md`). Edit
-`AGENTS.md`; never edit the symlinks directly — they exist purely so Claude Code, Codex,
-and Gemini CLI each find their expected filename with identical content, no duplication.
+`AGENTS.md` holds the shared instructions and is what Codex reads directly. `CLAUDE.md`
+and `GEMINI.md` are real files, not symlinks: each starts with an `@AGENTS.md` import
+line, followed by any tool-specific instructions. Claude Code and Gemini CLI both
+resolve `@path/to/file` imports, inlining the target's content at load time — so the
+import line pulls in everything in `AGENTS.md` plus whatever follows it locally.
+
+Edit shared content in `AGENTS.md`. Edit Claude-only or Gemini-only instructions
+directly in `CLAUDE.md` / `GEMINI.md`, below the import line.
 
 When adding this convention to a new subdirectory (e.g. a subproject with its own
-context), repeat the same pattern there: pick one real file, symlink the other two agent
-filenames to it. Don't overwrite an existing real instruction file with a symlink — if a
-directory already has a specific one, preserve it and point the missing filenames at it.
+context), repeat the same pattern: an `AGENTS.md` with the shared content, and
+`CLAUDE.md`/`GEMINI.md` each starting with `@AGENTS.md` plus their own additions. Don't
+overwrite an existing real instruction file — if a directory already has tool-specific
+content, preserve it and just add the `@AGENTS.md` import line at the top if it's
+missing.
 
 ## Detach / relaunch workflow
 
