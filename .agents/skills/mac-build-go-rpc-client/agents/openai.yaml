@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Go RPC Client"
+  short_description: "Build reliable, testable Go RPC clients"
+  default_prompt: "Use $mac-build-go-rpc-client to design and implement a production-quality Go RPC client."
