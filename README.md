@@ -14,3 +14,14 @@ duplication to keep in sync.
 Clone it and work directly in it. Once it becomes a real project, detach it from this
 template and push it as its own repo — see the "Detach / relaunch workflow" section in
 [`AGENTS.md`](AGENTS.md) for the exact commands.
+
+## Validation
+
+Run the checks from the repository root:
+
+```sh
+make test       # Python tests and Go tests, when go.mod exists
+make verify     # Python tests plus changed-file Go verification
+```
+
+Go checks are skipped until the copied project adds a `go.mod` file.
