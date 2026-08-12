@@ -52,3 +52,12 @@ its description clearly matches the task at hand — its mere presence in the re
 trigger anything automatically.
 
 See `RECAP.md` for the fuller context behind why this repo exists.
+
+## Local agent safety policy
+
+Agents may create files and directories, edit files, and run local tests, `make`,
+and other project tooling without asking for routine confirmation.
+
+Before deleting an existing file or directory, agents must ask the user for
+confirmation. This includes `rm`, `rmdir`, `git clean`, `git reset`, `git
+checkout`, and `git restore` when they would remove or overwrite existing work.

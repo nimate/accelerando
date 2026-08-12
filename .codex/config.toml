@@ -1,0 +1,4 @@
+# Work autonomously inside this repository, while retaining approval prompts
+# for actions that Codex classifies as requiring confirmation.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
