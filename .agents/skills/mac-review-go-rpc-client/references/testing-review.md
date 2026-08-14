@@ -16,6 +16,8 @@ Look for tests covering:
 - cleanup and `Close`,
 - concurrent calls when supported.
 
+For batch clients, also look for empty input, input/output alignment including duplicates, mixed per-item outcomes, retry of only transient items, retry of a transient transport failure, final per-item errors after exhaustion, out-of-order response correlation, and cancellation during a retry wait.
+
 Missing coverage is a finding only when it leaves a concrete defect or regression unguarded. Otherwise report it under test gaps.
 
 ## Test quality

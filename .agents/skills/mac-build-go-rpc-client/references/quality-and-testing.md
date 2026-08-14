@@ -41,6 +41,18 @@ Use `httptest.Server` or an in-process server to verify behavior owned by the ad
 
 Do not use a public endpoint in the default test suite. Put live compatibility checks behind an explicit environment variable or build tag.
 
+## Advanced batch tests
+
+When batching is required, additionally cover:
+
+- empty input makes no request and duplicate inputs retain their positions,
+- all successes and mixed per-item successes/errors are mapped to the matching input,
+- permanent item errors are not retried while only transient items are retried,
+- a transient whole-batch transport failure retries only safe pending work,
+- retry exhaustion preserves each item’s final error and the aggregate outcome is documented,
+- out-of-order responses, null results, malformed item data, and configured item/payload limits,
+- cancellation during a batch call and during the retry wait.
+
 ## Completion gate
 
 - No blanket retry of every error.

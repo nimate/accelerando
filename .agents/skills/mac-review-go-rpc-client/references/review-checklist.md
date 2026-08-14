@@ -35,6 +35,15 @@
 - Distinguish a missing value, JSON `null`, and a valid zero value when required by the protocol.
 - Check request ID generation and all shared mutable fields for races.
 
+## Batch correctness
+
+- Require batch-specific checks only when batching is implemented or explicitly required; do not flag its absence otherwise.
+- Check that each input has a stable original index and that outputs preserve input order and duplicates even if node responses arrive out of order.
+- Check item-level errors separately from a batch/transport-level error; a successful HTTP or batch call can still have failed elements.
+- Verify partial success and aggregate-error semantics are documented and preserve individual error identity.
+- Verify retries resend only transient, safe failed items after a response, while a transport error affects only the pending subset.
+- Check configured batch item/payload limits, chunking boundaries, and resulting ordering when provider limits are relevant.
+
 ## Observability and security
 
 - Log operation and safe endpoint identity, attempts, delays, and final outcome using structured fields.

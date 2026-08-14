@@ -1,4 +1,4 @@
 interface:
   display_name: "Build Go RPC Client"
-  short_description: "Build reliable, testable Go RPC clients"
-  default_prompt: "Use $mac-build-go-rpc-client to design and implement a production-quality Go RPC client."
+  short_description: "Build reliable Go and Ethereum RPC clients"
+  default_prompt: "Use $mac-build-go-rpc-client to build a production-quality Go RPC client, choosing basic single requests or JSON-RPC batching only when needed."

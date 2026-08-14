@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Go RPC Client"
-  short_description: "Audit Go RPC clients and their tests"
-  default_prompt: "Use $mac-review-go-rpc-client to review this Go RPC client and prioritize concrete findings."
+  short_description: "Audit Go and Ethereum RPC clients"
+  default_prompt: "Use $mac-review-go-rpc-client to review this Go RPC client, including JSON-RPC batch behavior when present, and prioritize concrete findings."

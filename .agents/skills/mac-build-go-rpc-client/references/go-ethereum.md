@@ -10,6 +10,14 @@ Use this variant when the request names `go-ethereum` or the repository already 
 - Keep `types.Header`, `types.Log`, `common.Hash`, `common.Address`, `hexutil`, and `rpc` types inside the adapter unless callers explicitly require native go-ethereum interoperability.
 - Map results into stable domain types and guard against nil headers or missing required fields before dereferencing.
 
+## Ethereum values and hex
+
+- Prefer go-ethereum's typed APIs and protocol types over strings: `common.Address`, `common.Hash`, `common.BytesToHash`, `common.HexToAddress` only when its permissive conversion semantics are appropriate, `types.*`, and `rpc.BlockNumber`.
+- Use `github.com/ethereum/go-ethereum/common/hexutil` for JSON-RPC quantity and data encoding/decoding (`EncodeUint64`, `Uint64`, `Big`, `Bytes`, and related types). Let `encoding/json` marshal/unmarshal those types where it owns the RPC wire representation.
+- Do not write local hex encoders, decoders, fixed-width padding, `0x` stripping, or `strconv.FormatUint(..., 16)` helpers for Ethereum RPC values. If go-ethereum has no suitable helper, first check the repository's approved `hexutils` package; otherwise add a narrowly tested dependency or helper only with a documented semantic need.
+- Distinguish RPC **quantities** (minimal `0x`-prefixed integer representation) from **data** (byte strings, where leading zero bytes are significant). Do not use address/hash conversion helpers to encode either.
+- Validate externally supplied addresses, hashes, and byte strings according to the consumer contract. Do not silently turn malformed input into a zero address/hash.
+
 ## Request semantics
 
 - Use `HeaderByNumber` when only header fields are required instead of fetching a full block.

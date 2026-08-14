@@ -1,6 +1,6 @@
 ---
 name: mac-review-go-rpc-client
-description: Review and audit existing Go RPC client implementations and their tests. Use when asked to review, assess, validate, or find bugs in RPC, JSON-RPC, HTTP API, blockchain, Ethereum, or go-ethereum client code, with emphasis on behavioral regressions, interface boundaries, context and timeout handling, error classification, retry and backoff correctness, observability, lifecycle cleanup, concurrency, security, and missing tests. Do not use for initial client implementation unless the user explicitly asks for both review and fixes.
+description: Review and audit existing Go RPC client implementations and their tests, including basic single-request and advanced JSON-RPC batch clients for Ethereum/go-ethereum. Use when asked to review, assess, validate, or find bugs in RPC, JSON-RPC, HTTP API, blockchain, Ethereum, or go-ethereum code, with emphasis on behavioral regressions, batch semantics, Ethereum hex correctness, interface boundaries, context and timeout handling, error classification, retry/backoff correctness, observability, lifecycle cleanup, concurrency, security, and missing tests. Do not use for initial client implementation unless the user explicitly asks for both review and fixes.
 ---
 
 # Review Go RPC Client
@@ -19,7 +19,7 @@ Do not report an issue merely because the code differs from a preferred pattern.
 
 ## Inspect systematically
 
-Read [review-checklist.md](references/review-checklist.md) and apply the relevant sections. Read [testing-review.md](references/testing-review.md) when evaluating coverage or running tests. For a `go-ethereum` adapter, also read [go-ethereum-review.md](references/go-ethereum-review.md).
+Read [review-checklist.md](references/review-checklist.md) and apply the relevant sections. Read [testing-review.md](references/testing-review.md) when evaluating coverage or running tests. For a `go-ethereum` adapter, also read [go-ethereum-review.md](references/go-ethereum-review.md). For JSON-RPC batching, also read [batch-json-rpc-review.md](references/batch-json-rpc-review.md).
 
 Prioritize these questions:
 

@@ -1,11 +1,18 @@
 ---
 name: mac-build-go-rpc-client
-description: Design, implement, or extend production-quality RPC clients in Go. Use when a task involves an RPC, JSON-RPC, HTTP API, blockchain, Ethereum, or go-ethereum client and needs explicit transport selection, narrow interfaces, domain mapping, context cancellation, timeouts, error classification, retry with exponential backoff and jitter, structured logging, lifecycle cleanup, and deterministic tests. Do not use for a review-only request that does not ask for implementation.
+description: Design, implement, or extend production-quality RPC clients in Go, including Ethereum JSON-RPC with go-ethereum. Use when a task needs a basic single-request client or an explicit advanced JSON-RPC batch client, with narrow interfaces, domain mapping, context cancellation, bounded retry/backoff and jitter, structured logging, lifecycle cleanup, safe Ethereum hex handling, and deterministic tests. Do not use for a review-only request that does not ask for implementation.
 ---
 
 # Build Go RPC Client
 
 Build the smallest client that satisfies the consumer while making network behavior explicit, observable, and testable. Adapt the workflow to the repository instead of imposing a fixed package layout.
+
+## Choose the capability level
+
+Implement the **basic** variant by default: one logical request maps to one RPC request. Implement the **advanced batch** variant only when the consumer needs multiple independent read-only calls, lower round-trip overhead, or partial per-item outcomes. Do not add batching speculatively.
+
+- For the basic variant, use the normal context-aware call exposed by the chosen adapter (`ethclient` method or `rpc.Client.CallContext`). Keep retries and one final result at the operation boundary.
+- For the batch variant, read [batch-json-rpc.md](references/batch-json-rpc.md) before designing or coding it. With go-ethereum use `rpc.Client.BatchCallContext` and `rpc.BatchElem`; do not hand-roll JSON-RPC IDs, envelopes, response matching, or batch decoding.
 
 ## Establish the contract
 
@@ -53,18 +60,18 @@ Read [retry-and-errors.md](references/retry-and-errors.md) before implementing r
 
 ## Implement the selected adapter
 
-For `go-ethereum`, read [go-ethereum.md](references/go-ethereum.md). For direct JSON-RPC over HTTP, read [raw-json-rpc.md](references/raw-json-rpc.md). Do not load an irrelevant variant.
+For `go-ethereum`, read [go-ethereum.md](references/go-ethereum.md). For direct JSON-RPC over HTTP, read [raw-json-rpc.md](references/raw-json-rpc.md). For the advanced batch variant, also read [batch-json-rpc.md](references/batch-json-rpc.md). Do not load an irrelevant variant.
 
 While implementing:
 
 1. Validate constructor configuration and reject unusable endpoints or policies early.
 2. Thread `context.Context` through every network operation.
-3. Avoid fetching data the consumer does not need.
+3. Avoid fetching data the consumer does not need. In an Ethereum client, prefer the most specific go-ethereum API or RPC method (for example a header query rather than a full block) and encode/decode protocol values with go-ethereum types.
 4. Map transport responses into domain results at the adapter boundary.
 5. Emit structured logs for operation, attempt, wait, endpoint identity without credentials, and final failure. Avoid logging secrets or unbounded payloads.
 6. Keep retry policy configurable without exposing stateful backoff instances for reuse.
 7. Make concurrent use safe when the public client is documented as concurrent-safe.
-8. Avoid speculative batching, caching, subscriptions, fallback endpoints, or generic frameworks.
+8. Avoid speculative caching, subscriptions, fallback endpoints, or generic frameworks. Add batching only after selecting the advanced batch variant above.
 
 ## Test in layers
 

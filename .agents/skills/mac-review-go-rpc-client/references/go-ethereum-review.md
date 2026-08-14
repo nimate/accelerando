@@ -17,6 +17,8 @@ Apply this checklist when the client wraps `github.com/ethereum/go-ethereum`.
 - Validate addresses and topic hashes without silently normalizing invalid user input.
 - Preserve filter semantics for nil bounds, named blocks, and topic alternatives.
 - Treat removed logs, chain reorganization, subscription reconnect, and gap backfill as requirements only when the client exposes streaming or indexing behavior.
+- Check every Ethereum wire-value conversion. Quantities and byte data have different zero-padding rules; local `0x`/hex helpers, manual integer formatting, or unchecked `HexTo*` conversion are defects when they can send malformed values or silently accept invalid caller input.
+- Prefer `common`, `types`, `rpc`, and `hexutil` types/helpers from the installed go-ethereum version. If no appropriate helper exists, verify that an approved `hexutils` dependency—not a bespoke converter—owns the required behavior.
 
 ## Errors and mutations
 
