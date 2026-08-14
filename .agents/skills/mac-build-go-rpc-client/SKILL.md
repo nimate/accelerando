@@ -89,9 +89,14 @@ Run repository-prescribed checks. For a normal Go repository, use the applicable
 
 ```sh
 gofmt -w <changed-go-files>
+go mod tidy # when this task adds, removes, or changes module dependencies
 go vet ./...
 go test ./...
 go test -race ./...
 ```
 
-Report which checks ran and any checks that could not run. Re-read [quality-and-testing.md](references/quality-and-testing.md) as the final completion checklist.
+You are explicitly authorized to run `gofmt` on Go files changed for the task. You may
+also run `go mod tidy` when the task changes module dependencies or leaves `go.mod` /
+`go.sum` out of sync. Do not run `go mod tidy` gratuitously: it can update unrelated
+dependency metadata. Report which checks ran and any checks that could not run. Re-read
+[quality-and-testing.md](references/quality-and-testing.md) as the final completion checklist.
