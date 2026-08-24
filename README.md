@@ -1,27 +1,72 @@
 # accelerando
 
-Starter template that gets AI agents up to speed the moment you clone.
+Accelerando is a Go-first pattern library and starter repo for AI-assisted software
+development.
 
-## Why the symlinks?
+Its job is simple:
 
-Claude Code, Codex, and Gemini CLI each look for their own instruction filename
-(`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`). This repo keeps one real file — `AGENTS.md` —
-and symlinks the other two to it, so all three tools read identical instructions with no
-duplication to keep in sync.
+- keep a local catalog of good implementation patterns for recurring service concerns
+- provide runnable service starters built from those patterns
+- give both humans and LLMs a concrete source of truth for how new Go services should be
+  shaped
 
-## Using this template
+The point is not to make the model invent architecture from scratch every time. The point
+is to encode repeatable decisions once, keep them local, and reuse them consistently.
 
-Clone it and work directly in it. Once it becomes a real project, detach it from this
-template and push it as its own repo — see the "Detach / relaunch workflow" section in
-[`AGENTS.md`](AGENTS.md) for the exact commands.
+## Project Shape
+
+The repo has two canonical layers:
+
+- `patterns/go/` for narrow, reusable implementation decisions such as graceful
+  shutdown, worker orchestration, config loading, structured logging, HTTP server
+  lifecycle, and rate limiting
+- `starters/go/` for runnable service shapes such as an HTTP API, background worker, and
+  CLI, each assembled from those patterns
+
+Supporting docs live under `docs/`, and [`docs/architecture/catalog.md`](docs/architecture/catalog.md)
+is the main navigation index.
+
+## Start Here
+
+- Read [`docs/architecture/catalog.md`](docs/architecture/catalog.md) for the repo map.
+- Use a directory under `starters/go/` when starting a new service.
+- Use a directory under `patterns/go/` when you need one focused behavior in an existing
+  codebase.
+- Treat [`_playground/`](./_playground) as non-canonical scratch/import material.
+
+## Pattern Contract
+
+Each pattern directory should stay small and opinionated:
+
+- one concern per directory
+- one short `README.md` with `Purpose`, `Use When`, `Avoid When`, `Guarantees`,
+  `Tradeoffs`, `Implementation Notes`, `Copy Surface`, and `Related`
+- code that is runnable or very close to runnable
+- comments that explain decisions, not language syntax
+
+## Starter Contract
+
+Each starter directory should be a thin composition of patterns:
+
+- runnable as its own Go module
+- explicit about which patterns it uses
+- clear about what was intentionally left out
+- easy to extend without inventing a new local architecture
+
+## Repo Rule
+
+If a starter grows a useful, repeatable behavior, that behavior should be promoted into
+`patterns/go/` and documented there. Starters are assemblies, not a second hidden pattern
+library.
 
 ## Validation
 
-Run the checks from the repository root:
+Run checks from the repository root:
 
 ```sh
-make test       # Python tests and Go tests, when go.mod exists
-make verify     # Python tests plus changed-file Go verification
+make test
+make verify
 ```
 
-Go checks are skipped until the copied project adds a `go.mod` file.
+`make test` runs Python tests and Go tests across all discovered Go modules.
+`make verify` runs Python tests plus changed-file Go verification and formatting.

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+  printf 'test-go-modules: not inside a Git repository\n' >&2
+  exit 1
+}
+
+cd "$repo_root" || exit 1
+
+gocache_root="${TMPDIR:-/tmp}/accelerando-go-cache"
+mkdir -p "$gocache_root"
+export GOCACHE="$gocache_root"
+
+module_roots=()
+while IFS= read -r module_root; do
+  module_roots+=("$module_root")
+done < <(find . -name go.mod -not -path './.git/*' -exec dirname {} \; | sort)
+
+if (( ${#module_roots[@]} == 0 )); then
+  printf 'test-go-modules: no go.mod files found\n'
+  exit 0
+fi
+
+for module_root in "${module_roots[@]}"; do
+  printf 'test-go-modules: running go test ./... in %s\n' "$module_root"
+  (cd "$module_root" && go test ./...)
+done

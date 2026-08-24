@@ -9,7 +9,12 @@ repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
 
 cd "$repo_root" || exit 1
 
+gocache_root="${TMPDIR:-/tmp}/accelerando-go-cache"
+mkdir -p "$gocache_root"
+export GOCACHE="$gocache_root"
+
 go_files=()
+module_roots=()
 
 while IFS= read -r -d '' file; do
   if [[ -f "$file" ]]; then
@@ -30,25 +35,63 @@ if (( ${#go_files[@]} == 0 )); then
   exit 0
 fi
 
+find_module_root() {
+  local path="$1"
+  local dir
+
+  dir="$(dirname "$path")"
+  while [[ "$dir" != "." && "$dir" != "/" ]]; do
+    if [[ -f "$dir/go.mod" ]]; then
+      printf '%s\n' "$dir"
+      return 0
+    fi
+    dir="$(dirname "$dir")"
+  done
+
+  if [[ -f "go.mod" ]]; then
+    printf '.\n'
+    return 0
+  fi
+
+  return 1
+}
+
 printf 'verify-go: formatting %d changed Go file(s)\n' "${#go_files[@]}"
 if ! gofmt -w "${go_files[@]}"; then
   printf 'verify-go: gofmt failed\n' >&2
   exit 1
 fi
 
+for file in "${go_files[@]}"; do
+  if ! module_root="$(find_module_root "$file")"; then
+    module_root='.'
+  fi
+  module_roots+=("$module_root")
+done
+
+deduped_module_roots=()
+while IFS= read -r module_root; do
+  deduped_module_roots+=("$module_root")
+done < <(printf '%s\n' "${module_roots[@]}" | awk '!seen[$0]++')
+module_roots=("${deduped_module_roots[@]}")
+
 run_check() {
   local label="$1"
+  local module_root="$2"
+  shift
   shift
 
-  printf 'verify-go: running %s\n' "$label"
-  if ! "$@"; then
-    printf 'verify-go: %s failed\n' "$label" >&2
+  printf 'verify-go: running %s in %s\n' "$label" "$module_root"
+  if ! (cd "$module_root" && "$@"); then
+    printf 'verify-go: %s failed in %s\n' "$label" "$module_root" >&2
     return 1
   fi
 }
 
-run_check 'go vet ./...' go vet ./... || exit 1
-run_check 'go test ./...' go test ./... || exit 1
-run_check 'go test -race ./...' go test -race ./... || exit 1
+for module_root in "${module_roots[@]}"; do
+  run_check 'go vet ./...' "$module_root" go vet ./... || exit 1
+  run_check 'go test ./...' "$module_root" go test ./... || exit 1
+  run_check 'go test -race ./...' "$module_root" go test -race ./... || exit 1
+done
 
 printf 'verify-go: all checks passed\n'
