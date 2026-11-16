@@ -28,8 +28,12 @@ is the main navigation index.
 
 ## Start Here
 
+- On [GitHub](https://github.com/nimate/accelerando), select **Use this template** →
+  **Create a new repository**. Name your project, then clone the new repository to
+  work on it locally. It starts with the full Accelerando structure and its own Git
+  history and remote.
 - Read [`docs/architecture/catalog.md`](docs/architecture/catalog.md) for the repo map.
-- Use a directory under `starters/go/` when starting a new service.
+- Use a directory under `starters/go/` as the starting shape for your service.
 - Use a directory under `patterns/go/` when you need one focused behavior in an existing
   codebase.
 - Treat [`_playground/`](./_playground) as non-canonical scratch/import material.
