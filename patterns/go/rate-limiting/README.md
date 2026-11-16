@@ -31,12 +31,14 @@ Allow short bursts while enforcing a steady processing rate.
 ## Implementation Notes
 
 The pattern uses a buffered channel as a token bucket. It is intentionally small and easy
-to reason about.
+to reason about. Its refill loop exits when the context is canceled; wait for `done`
+before the process stops.
 
 ## Copy Surface
 
-Copy the limiter construction and token refill goroutine. Replace the request simulation
-with real inbound work.
+Copy the limiter construction, context-aware refill goroutine, and shutdown wait. Replace
+the request simulation with real inbound work. Workers waiting for a token must also
+select on their context's `Done` channel.
 
 ## Related
 

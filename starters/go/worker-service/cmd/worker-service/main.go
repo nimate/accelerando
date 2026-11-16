@@ -46,24 +46,31 @@ func newLogger(service string) *slog.Logger {
 	})).With("service", service)
 }
 
-func newBurstLimiter(depth int, rate time.Duration) <-chan time.Time {
+func newBurstLimiter(ctx context.Context, depth int, rate time.Duration) (<-chan time.Time, <-chan struct{}) {
 	limiter := make(chan time.Time, depth)
+	done := make(chan struct{})
 	for i := 0; i < depth; i++ {
 		limiter <- time.Now()
 	}
 
 	go func() {
+		defer close(done)
 		ticker := time.NewTicker(rate)
 		defer ticker.Stop()
-		for tick := range ticker.C {
+		for {
 			select {
-			case limiter <- tick:
-			default:
+			case <-ctx.Done():
+				return
+			case tick := <-ticker.C:
+				select {
+				case limiter <- tick:
+				default:
+				}
 			}
 		}
 	}()
 
-	return limiter
+	return limiter, done
 }
 
 func main() {
@@ -76,13 +83,15 @@ func main() {
 	rootCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	limiter := newBurstLimiter(3, 500*time.Millisecond)
 	group, ctx := errgroup.WithContext(rootCtx)
+	limiter, limiterDone := newBurstLimiter(ctx, 3, 500*time.Millisecond)
 
 	group.Go(func() error { return poller(ctx, logger, cfg.PollEvery, limiter) })
 	group.Go(func() error { return queueWorker(ctx, logger) })
 
-	if err := group.Wait(); err != nil && !errors.Is(err, context.Canceled) {
+	err = group.Wait()
+	<-limiterDone
+	if err != nil && !errors.Is(err, context.Canceled) {
 		logger.Error("worker group failed", "error", err)
 		os.Exit(1)
 	}
@@ -100,7 +109,12 @@ func poller(ctx context.Context, logger *slog.Logger, every time.Duration, limit
 			logger.Info("poller stopping")
 			return ctx.Err()
 		case <-ticker.C:
-			<-limiter
+			select {
+			case <-ctx.Done():
+				logger.Info("poller stopping")
+				return ctx.Err()
+			case <-limiter:
+			}
 			logger.Info("poller tick")
 		}
 	}
