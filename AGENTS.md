@@ -15,8 +15,6 @@ Routing rules for agents working in this repo.
 - `patterns/go/` is the canonical source for focused reusable concerns.
 - `starters/go/` is the canonical source for runnable service shapes.
 - `docs/architecture/` is the canonical navigation and repo-structure surface.
-- `_playground/` is non-canonical scratch/import material and should not be treated as
-  the source of truth.
 
 ## How To Choose
 

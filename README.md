@@ -36,7 +36,6 @@ is the main navigation index.
 - Use a directory under `starters/go/` as the starting shape for your service.
 - Use a directory under `patterns/go/` when you need one focused behavior in an existing
   codebase.
-- Treat [`_playground/`](./_playground) as non-canonical scratch/import material.
 
 ## AI Tooling
 

@@ -20,5 +20,3 @@
 - Prefer a starter when beginning a new service.
 - Prefer a pattern when modifying an existing codebase.
 - If a starter introduces reusable behavior, extract or update the pattern first.
-- `_playground/` is reference material only and should not be cited as the canonical
-  source.

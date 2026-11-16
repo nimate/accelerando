@@ -43,4 +43,3 @@ select on their context's `Done` channel.
 ## Related
 
 - `../worker-group`
-- `../../../../_playground/burst-limiter`

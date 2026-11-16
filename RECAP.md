@@ -35,13 +35,6 @@ Canonical:
 - `starters/go/*`
 - `docs/architecture/*`
 
-Non-canonical:
-
-- `_playground/`
-
-`_playground/` may contain useful seeds or copies from other projects, but it is not the
-source of truth and should not be treated as the recommended implementation location.
-
 ## Operating Rule
 
 If code inside a starter expresses a reusable concern, promote it into `patterns/go/`
