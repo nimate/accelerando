@@ -38,6 +38,35 @@ is the main navigation index.
   codebase.
 - Treat [`_playground/`](./_playground) as non-canonical scratch/import material.
 
+## AI Tooling
+
+Codex is the primary agent used with this repository today. Automatic Go verification
+is configured for Codex; Claude and Gemini share the repository rules but have no
+equivalent verification hook configured. With those tools, run `make verify` explicitly.
+See [Validation](#validation) for the available commands.
+
+The repository keeps agent instructions, task-specific skills, and verification commands
+alongside the code:
+
+- [`AGENTS.md`](AGENTS.md) defines repository boundaries and directs agents to load only
+  the context relevant to the task. [`CLAUDE.md`](CLAUDE.md) and
+  [`GEMINI.md`](GEMINI.md) reference the same rules.
+- [`.agents/skills/`](.agents/skills/) contains reusable instructions for building and
+  reviewing Go RPC clients, with supporting references loaded as needed.
+  [`.claude/skills/`](.claude/skills/) points to those canonical skill definitions.
+- [`.codex/`](.codex/) contains repository configuration and a stop hook that invokes
+  [`scripts/verify-go`](scripts/verify-go). For changed Go files, the script runs
+  `gofmt`, then `go vet`, tests, and race detection in the affected modules.
+
+In Codex CLI, trust the project and use `/hooks` to review and trust the repository's
+hook before it can run. When verification fails, the stop hook asks the agent to fix the
+failure and continue. If verification still fails on the next stop, it reports the
+failure and stops automatic continuation to avoid a loop.
+
+Start the agent from the repository root, describe the task, and use the catalog and
+relevant skills to guide implementation. Review the resulting diff and verification
+output before committing.
+
 ## Pattern Contract
 
 Each pattern directory should stay small and opinionated:
